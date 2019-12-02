@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="./style/index.css">
+</head>
+
+<body>
+    <a href="javascript:void (0);" class="unfold-btn flag-up show-none" id="unfold">展开</a>
+    <br>
+    <div id="box1" class="box1 height-limit">
+        <div id=box2 class="box2">
+            <ul>
+                <li class="item"><a href="javascript:void (0);" class="active">推荐</a></li>
+                <li class="item"><a href="javascript:void (0);">人物</a></li>
+                <li class="item"><a href="javascript:void (0);">融资</a></li>
+                <li class="item"><a href="javascript:void (0);">IPO</a></li>
+                <li class="item"><a href="javascript:void (0);">人工智能</a></li>
+                <li class="item"><a href="javascript:void (0);">在线教育</a></li>
+                <li class="item"><a href="javascript:void (0);">文创娱乐</a></li>
+                <li class="item"><a href="javascript:void (0);">行业</a></li>
+                <li class="item"><a href="javascript:void (0);">创富</a></li>
+                <li class="item"><a href="javascript:void (0);">新零售</a></li>
+                <li class="item"><a href="javascript:void (0);">共享经济</a></li>
+                <li class="item"><a href="javascript:void (0);">金融科技</a></li>
+                <li class="item"><a href="javascript:void (0);">医疗健康</a></li>
+                <li class="item"><a href="javascript:void (0);">体育经济</a></li>
+                <li class="item"><a href="javascript:void (0);">游戏</a></li>
+                <li class="item"><a href="javascript:void (0);">互联网出海</a></li>
+                <li class="item"><a href="javascript:void (0);">企业级服务</a></li>
+                <li class="item"><a href="javascript:void (0);">社交</a></li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
+
+<script type="text/javascript">
+    window.onload = function () {
+        let box1 = document.querySelector('#box1')
+        let box1Height = box1.clientHeight;
+        let box2 = document.querySelector('#box2')
+        let box2Height = box2.clientHeight;
+        let btn = document.querySelector('#unfold')
+        let btnCls = btn.getAttribute("class");
+        let currType = 'close'
+        if(box2Height > box1Height){
+            btnCls = btnCls.replace('show-none','show-block')
+            btn.innerText = '展开'
+            btn.setAttribute('class',btnCls)
+        }
+        btn.onclick = function(){
+            if(currType == 'close'){
+                let box1Cls = box1.getAttribute("class")
+                box1Cls = box1Cls.replace('height-limit','')
+                box1.setAttribute('class',box1Cls)
+                currType = 'show'
+            }else{
+                let box1Cls = box1.getAttribute("class")
+                box1Cls = box1Cls + ' height-limit'
+                box1.setAttribute('class',box1Cls)
+                currType = 'close'
+            }
+        }
+    }
+
+</script>
