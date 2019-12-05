@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>努力做优秀的人！</title>
+    <script>
+        //如果你想要变优秀，你的敌人只有你自己！！！
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0
+        }
+
+        img {
+            vertical-align: top;
+        }
+        .main {
+            margin: 0 auto;
+            width: 1000px;
+            margin-top: 10px;
+
+        }
+        .fixed {
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
+        .top {
+            margin: 0 auto;
+            width: 1423px;
+        }
+        .nav {
+            width: 100%;
+        }
+        #navBar {
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+<div class="top" id="topPart">
+    <img src="img/top.png" alt=""/>
+</div>
+<div class="nav" id="nav">
+    <div id="navBar">
+        <img src="img/nav.png" alt=""/>
+    </div>
+</div>
+<div class="main" id="mainPart">
+    <img src="img/main.png" alt=""/>
+</div>
+<script>
+
+    //兼容的获取不同浏览器之间的页面滚动出去的距离的函数
+    function getScroll (){
+        return {
+            top:document.body.scrollTop || document.documentElement.scrollTop || window.pageYOffset || 0,
+            left:document.body.scrollLeft || document.documentElement.scrollLeft || window.pageXOffset || 0
+        };
+    }
+
+    // 当页面在滚动的时候，获取滚动出去的垂直距离，当距离超过一定的数值，就让nav定位
+
+    var topPart = document.getElementById("topPart");
+    var nav = document.getElementById("nav");
+    var mainPart = document.getElementById("mainPart");
+    
+    window.onscroll = function(){
+        var maxHeight = topPart.offsetHeight ;
+        var top = getScroll().top;
+        // console.log('top',top);
+        // console.log('maxHeight',maxHeight);
+        if(top >= maxHeight){
+            //固定导航栏 -- fixed类名
+            nav.className = "nav fixed";
+            mainPart.style.paddingTop = nav.offsetHeight + "px";
+        }else {
+            //回去
+            nav.className = "nav";
+            mainPart.style.paddingTop = 0;
+        }
+    }
+</script>
+</body>
+</html>
