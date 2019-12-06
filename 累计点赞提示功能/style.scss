@@ -1,0 +1,32 @@
+// 提示的一些小样式处理
+.share-tips{
+    position: absolute;
+    right: 0;
+    top:-45px;
+    padding: 0 16px;
+    color:#fff;
+    background: #07c160;
+    height: 50px;
+    border-radius: 5px;
+    line-height: 50px;
+    font-size: 24px;
+    text-align: center;
+    white-space: nowrap;
+    transition:all 2s ease;
+    animation: scaleTips .5s  linear; 
+    transform-origin:100% 100%;
+    &::after{
+        content: "";
+        position: absolute;
+        bottom:-19px;
+        right:10px;
+        border:10px solid transparent;
+        border-top: 10px solid #07c160;
+    }
+}
+@keyframes scaleTips
+{ 
+    0%   {transform: scale(0);}        
+    50%   { transform: scale(0.5);}   
+    100%   { transform: scale(1);}             
+}
