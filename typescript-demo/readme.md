@@ -1,0 +1,1 @@
+# 梳理typescript知识的demo code，文档资料在markdown库的typescript-summary中
