@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <div>js实现给图片添加水印</div>
+    <!-- canvas有默认的宽高：300 * 150 -->
+    <canvas id="c1"></canvas>
+    <input type="text" value="" id="text">
+    <a href="javascript:void(0);" id="btn">添加水印</a>
+</body>
+
+</html>
+
+<script>
+    function shuiyin(canvasId, imgUrl, text) {
+        var img = new Image();
+        img.src = imgUrl;
+        img.onload = () => {
+            var canvas = document.getElementById(canvasId);
+            var ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0);
+            ctx.font = "20px 微软雅黑";
+            ctx.fillStyle = "rgb(255,0,0)";
+            document.getElementById('btn').onclick = () => {
+                var addtext = document.getElementById("text").value;
+                ctx.fillText(addtext, 10, 50);
+            }
+            if(text){
+                ctx.fillText(text,10,50)
+            }
+        }
+    }
+    shuiyin('c1', './img/t1.jpeg', '777')
+</script>
