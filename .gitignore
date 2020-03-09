@@ -1,1 +1,4 @@
 .DS_Store
+vue-ui-demo
+node_modules
+dist
