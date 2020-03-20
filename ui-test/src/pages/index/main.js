@@ -4,9 +4,11 @@ import App from './App.vue'
 Vue.config.productionTip = false
 
 import ui from '@/vue-ui-demo'
-console.log(ui);
 Vue.use(ui)
+
+import store from './store/index.js'
 
 new Vue({
   render: h => h(App),
+  store,
 }).$mount('#app')
