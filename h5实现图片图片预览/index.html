@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="./index.css">
+</head>
+
+
+<body>
+    <div class="feedback-container">
+        <!-- 图片上传 -->
+        <div class="form-item upload-pic">
+            <div class="form-item-label hidden">上传图片</div>
+
+            <div class="images-list" *ngFor="let item of imageLists">
+                <img [src]="item.img" alt="">
+            </div>
+            <div class="upload-pic-btn">
+                <ion-icon name="add-outline" ios></ion-icon>
+                <input (change)="chooseImageHandler($event)" type="file" value="上传文件" id="file"
+                    accept="image/png, image/jpeg, image/gif, image/jpg" multiple />
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
