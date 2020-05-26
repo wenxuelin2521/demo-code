@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="./index.css">
+</head>
+
+<body>
+    <div class="out">
+        <ul>
+            <li class="btn" data-index="1">1</li>
+            <li class="btn" data-index="2">2</li>
+            <li class="btn" data-index="3">3</li>
+            <li class="btn" data-index="4">4</li>
+        </ul>
+        <div class="tab tabs1" [class.active]="activeIndex === 1" [class.leave]="activeIndex !== 1">11111</div>
+        <div class="tab tabs2" [class.active]="activeIndex === 2" [class.leave]="activeIndex !== 2">22222</div>
+        <div class="tab tabs3" [class.active]="activeIndex === 3" [class.leave]="activeIndex !== 3">33333</div>
+        <div class="tab tabs4" [class.active]="activeIndex === 4" [class.leave]="activeIndex !== 4">44444</div>
+
+    </div>
+</body>
+<script src="./index.js"></script>
+
+</html>
