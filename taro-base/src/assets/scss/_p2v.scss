@@ -1,0 +1,3 @@
+@function p2v($size) {
+    @return $size / 7.5 * 1vw
+}

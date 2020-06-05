@@ -1,0 +1,26 @@
+<!-- Generated template for the CustomKeyboardComponent component -->
+<div class="component-custom-keyboard" [class.slide-enter-active]="keyboardActive=== true" [class.slide-leave-active]="keyboardActive === false">
+    <div class="keyboard">
+      <!-- 工具栏 -->
+      <div class="tootbar">
+        <span class="hide-keyboard" (click)="done()"></span>
+      </div>
+      <!-- 键盘区域 -->
+      <div class="list">
+        <div (touchend)="touchend($event)" (touchstart)="typing($event ,numberList[0])" class="key">{{numberList[0]}}</div>
+        <div (touchend)="touchend($event)" (touchstart)="typing($event ,numberList[1])" class="key">{{numberList[1]}}</div>
+        <div (touchend)="touchend($event)" (touchstart)="typing($event ,numberList[2])" class="key">{{numberList[2]}}</div>
+        <div (touchend)="touchend($event)" (touchstart)="typing($event ,numberList[3])" class="key">{{numberList[3]}}</div>
+        <div (touchend)="touchend($event)" (touchstart)="typing($event ,numberList[4])" class="key">{{numberList[4]}}</div>
+        <div (touchend)="touchend($event)" (touchstart)="typing($event ,numberList[5])" class="key">{{numberList[5]}}</div>
+        <div (touchend)="touchend($event)" (touchstart)="typing($event ,numberList[6])" class="key">{{numberList[6]}}</div>
+        <div (touchend)="touchend($event)" (touchstart)="typing($event ,numberList[7])" class="key">{{numberList[7]}}</div>
+        <div (touchend)="touchend($event)" (touchstart)="typing($event ,numberList[8])" class="key">{{numberList[8]}}</div>
+        <div (touchend)="touchend($event)" (touchstart)="typing($event ,'done')" class="key done" >完成</div>
+        <div (touchend)="touchend($event)" (touchstart)="typing($event ,numberList[9])" class="key" >{{numberList[9]}}</div>
+        <div (touchend)="touchend($event)" (touchstart)="typing($event ,'delete')" class="key delete"></div>
+      </div>
+  
+    </div>
+  </div>
+  
