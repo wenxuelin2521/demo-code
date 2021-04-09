@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>统计用户停留网站时长</title>
+</head>
+
+<body>
+    <a href="/统计用户停留网站时长/site/index.html" target="_blank">点击打开新页面</a>
+</body>
+
+</html>
+
+
+<script>
+    // function getNowTime(){
+    //     let nowTime = new Date().getTime()
+    //     return nowTime
+    // }
+    // window.addEventListener('load' , function(){
+
+    //     let nowTime = getNowTime()
+    //     let openPageCount = localStorage.getItem('openPageCount') || 0
+    //     openPageCount += 1
+    //     localStorage.setItem('openPageCount' , openPageCount)
+
+    //     if(sessionStorage.getItem('flag')){
+    //         return
+    //     }
+    //     localStorage.setItem('startTime' , nowTime)
+    //     sessionStorage.setItem('flag' , true)
+    // })
+    // window.addEventListener('beforeunload' , function(){
+    //     let nowTime = getNowTime()
+    //     let openPageCount = localStorage.getItem('openPageCount')
+    //     openPageCount -= 1
+    //     localStorage.setItem('endTime' , nowTime)
+    //     localStorage.setItem('openPageCount' , openPageCount)
+    //     if(openPageCount == 0){
+    //         // 页面全部关闭，将数据传递给后台
+    //     }
+    // })
+</script>
+
+
+<script>
+    window.addEventListener("load", function () {
+        let nowTime = getNowTime()
+        let openPageCount = localStorage.getItem("openPageCount")
+        openPageCount = openPageCount ? parseInt(openPageCount) : 0
+        openPageCount += 1
+        localStorage.setItem("openPageCount", openPageCount)
+        refreshTime()
+        let isRightTime = compareRefreshTime()
+        //其实说明是页面是刷新后加载的，不需要统计开始时间
+        if (sessionStorage.getItem("flag") && isRightTime) {
+            return;
+        }
+        localStorage.setItem("startTime", nowTime)
+        localStorage.setItem("refreshTime", nowTime)
+        sessionStorage.setItem("flag", true);
+    })
+
+    window.addEventListener("beforeunload", function () {
+        let nowTime = getNowTime()
+        let openPageCount = localStorage.getItem("openPageCount")
+        openPageCount -= 1
+        localStorage.setItem("endTime", nowTime)
+        localStorage.setItem("openPageCount", openPageCount)
+        if (openPageCount == 0) {
+            //说明页面全部关闭，这时候可以传数据给后台
+        }
+    })
+
+    function getNowTime() {
+        let nowTime = new Date().getTime()
+        return nowTime
+    }
+
+    function compareRefreshTime() {
+        let nowTime = getNowTime()
+        let refreshTime = localStorage.getItem("refreshTime")
+        return nowTime - refreshTime < 60 * 1000
+    }
+
+    function refreshTime() {
+        setTimeout(refreshTime, 30 * 1000)
+        let nowTime = getNowTime()
+        localStorage.setItem("refreshTime", nowTime)
+    }
+</script>
