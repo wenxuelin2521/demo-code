@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+        }
+
+        .container {
+            width: 1800px;
+            height: 800px;
+            margin: 0 auto;
+            border: 1px solid #000;
+            position: relative;
+        }
+
+        .container .tooltips {
+            display: none;
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background-color: #fff;
+            border: 1px solid #ebeef5;
+            box-shadow: 2px 2px 12px 0 rgb(0 0 0 / 10%);
+            padding: 8px;
+            font-size: 12px;
+            /* z-index: 99999; */
+        }
+        .container .tooltips::before{
+            content: "";
+            position: absolute;
+            width: 0;
+            height: 0;
+            border: 5px solid transparent;
+            border-right-color : #ebeef5;
+            left: -10px;
+            top:50%;
+            transform: translateY(-50%);
+        }
+    </style>
+    <script src="http://www.jtopo.com/js/jquery.js"></script>
+    <script src="http://www.jtopo.com/download/jtopo-0.4.8-min.js"></script>
+    <script src="http://www.jtopo.com/demo/js/toolbar.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <div class="tooltips" id="tooltips">
+
+        </div>
+        <canvas id="canvas" width="1800" height="800"></canvas>
+        
+    </div>
+</body>
+
+</html>
+
+<script>
+    $(document).ready(function () {
+        let treeData = [
+            {
+                name: 'xxx台区',
+                children: [
+                    { name: '设备1', children: [{ name: '线路1' }, { name: '线路2' }, { name: '线路3' }] },
+                    { name: '设备2', children: [{ name: '线路1' }, { name: '线路2' }, { name: '线路3' }] },
+                    { name: '设备3', children: [{ name: '线路1' }, { name: '线路2' }, { name: '线路3' }] },
+                    { name: '设备4', children: [{ name: '线路1' }, { name: '线路2' }, { name: '线路3' }] },
+                    { name: '设备5', children: [{ name: '线路1' }, { name: '线路2' }, { name: '线路3' }] },
+                ]
+            }
+        ]
+        var canvas = document.getElementById('canvas');
+        var stage = new JTopo.Stage(canvas);
+        //显示工具栏
+        showJTopoToobar(stage);
+        var scene = new JTopo.Scene(stage);
+
+        scene.alpha = 1;
+        // scene.backgroundColor = '255,120,120';
+        scene.backgroundColor = '255,255,255';
+
+        function addLink(nodeA, nodeZ) {
+            var link = new JTopo.FlexionalLink(nodeA, nodeZ);
+            link.strokeColor = '36,36,36';
+            link.lineWidth = 1;
+            scene.add(link);
+            return link;
+        }
+
+        function addNode(template) {
+            var node = new JTopo.Node();
+            node.fillColor = "0,255,0"
+            node.fontColor = '0,0,0';
+            node.setSize(80, 60);
+            node.text = template.name;
+            scene.add(node);
+            node.mouseover(function () {
+                let { left, top } = this.getBound()
+                console.log(left, top)
+                $('#tooltips').text('测试测试测试测试测试测试测试测')
+                $('#tooltips').css({'display':'block',left : left + 105 , top: top -30})
+            });
+            node.mouseout(function () {
+                $('#tooltips').css('display' , 'none')
+            });
+            return node;
+        }
+
+
+
+        function drawTreeByData(target, parentNode) {
+            let currentNode = addNode(target)
+            if (parentNode) {
+                addLink(parentNode, currentNode)
+            }
+            if (!target.children || !target.children.length) return
+
+            for (child of target.children) {
+                drawTreeByData(child, currentNode)
+            }
+        }
+
+        drawTreeByData(treeData[0])
+
+
+        // 树形布局
+        scene.doLayout(JTopo.layout.TreeLayout('down', 100, 160));
+    });
+</script>
