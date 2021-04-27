@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="./iconfont/iconfont.css">
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+        }
+
+        .container {
+            /* width: 100vh;
+            height: 100vw;
+            transform-origin: 100% 0;
+            transform: translate(-100%,0) rotate(-90deg); */
+            width: 100vw;
+            height: 100vh;
+        }
+
+        /* 节点样式 */
+        .common-node {
+            width: 120px;
+            height: 40px;
+            overflow: hidden;
+            border-radius: 5px;
+            background-color: #1265a4;
+            display: flex;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .common-node .iconfont {
+            width: 40px;
+            height: 40px;
+            overflow: hidden;
+            line-height: 32px;
+            border: 4px solid #1265a4;
+            border-radius: 5px;
+            text-align: center;
+            background-color: #eee;
+            font-size: 30px;
+        }
+
+        .common-node .label {
+            flex: 1;
+            padding: 0 5px;
+            font-size: 14px;
+            line-height: 40px;
+            color: #fff;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
+        /* .common-node .tooltips{
+            position: absolute;
+            left : 100% ;
+            top:0;
+            display: none;
+            padding: 16px;
+            background-color: #ffcaca;
+
+        }
+
+        .common-node:hover .tooltips {
+            display: block;
+        } */
+
+        /* 图标颜色取值*/
+        .red {
+            color: #d81e06;
+        }
+
+        .green {
+            color: #1afa29;
+        }
+
+        .purple {
+            color: #d4237a;
+        }
+
+        .yellow {
+            color: #f4ea2a;
+        }
+
+        .blue {
+            color: #1296db;
+        }
+    </style>
+    <script src="https://gw.alipayobjects.com/os/lib/antv/g6/4.2.7/dist/g6.min.js"></script>
+    <script src="./data.js"></script>
+</head>
+
+<body>
+    <!-- <div class="common-node">
+        <span class="iconfont iconshebei"></span>
+        <span class="label">这是一台服务器</span>
+    </div> -->
+    <div id="container" class="container"></div>
+</body>
+
+</html>
+
+<script>
+
+    function selectIcon(level = 0, status = "01") {
+
+        const iconList = ["iconkehufenbutu", "iconshebei", "iconwangdianjifang", "iconshebeiguanli", "iconzhuji"]
+
+        const colorList = {
+            "01": "red",
+            "02": "green",
+            "03": "purple",
+            "04": "yellow",
+            "05": "blue"
+        }
+
+        return `${iconList[level]}  ${colorList[status]}`
+
+    }
+
+
+    G6.Util.traverseTree(data, (d) => {
+
+        let classStr = selectIcon(d.level, d.status)
+
+        d.html = `<div class="common-node">
+                    <span class="iconfont ${classStr}"></span>
+                    <span class="label">${d.label}</span>
+                </div>`;
+        d.size = [120, 40]
+        return true
+
+    });
+
+
+    // 自定义dom节点
+    G6.registerNode('dom-node', {
+        options: {
+            size: [60, 20],
+            stroke: '#91d5ff',
+            fill: '#91d5ff',
+        },
+        draw(cfg, group) {
+            let styles = this.getShapeStyle(cfg);
+            console.log(styles)
+            let w = styles.width;
+            let h = styles.height;
+            const shape = group.addShape('dom', {
+                attrs: {
+                    width: cfg.size[0],
+                    height: cfg.size[1],
+                    // DOM's html
+                    html: cfg.html,
+                },
+                name: 'dom-box',
+                draggable: true,
+            });
+            group.addShape('rect', {
+                attrs: {
+                    width: cfg.size[0],
+                    height: cfg.size[1],
+                    fill: "transparent",
+                },
+                name: 'tooltips-box',
+                draggable: true,
+            });
+            return shape;
+        }
+    }, 'rect')
+
+    // 自定义节点
+    G6.registerNode('icon-node', {
+        options: {
+            size: [60, 20],
+            stroke: '#91d5ff',
+            fill: '#91d5ff',
+        },
+        draw(cfg, group) {
+            console.log(this)
+            let styles = this.getShapeStyle(cfg);
+            let { labelCfg = {} } = cfg;
+
+            let w = styles.width;
+            let h = styles.height;
+
+            let keyShape = group.addShape('rect', {
+                attrs: {
+                    ...styles,
+                    x: -w / 2,
+                    y: -h / 2,
+                },
+            });
+
+            if (cfg.leftIcon) {
+                let { style, img } = cfg.leftIcon;
+                group.addShape('rect', {
+                    attrs: {
+                        x: 1 - w / 2,
+                        y: 1 - h / 2,
+                        width: 38,
+                        height: styles.height - 2,
+                        fill: '#8c8c8c',
+                        ...style,
+                    },
+                });
+
+                group.addShape('image', {
+                    attrs: {
+                        x: 8 - w / 2,
+                        y: 8 - h / 2,
+                        width: 24,
+                        height: 24,
+                        img:
+                            img ||
+                            'https://g.alicdn.com/cm-design/arms-trace/1.0.155/styles/armsTrace/images/TAIR.png',
+                    },
+                    name: 'image-shape',
+                });
+            }
+
+
+            if (cfg.label) {
+                group.addShape('text', {
+                    attrs: {
+                        ...labelCfg.style,
+                        text: cfg.label,
+                        x: 50 - w / 2,
+                        y: 25 - h / 2,
+                    },
+                });
+            }
+
+            return keyShape;
+        },
+        update: undefined,
+    }, 'rect');
+
+
+    // 自定义边
+    G6.registerEdge('flow-line', {
+        draw(cfg, group) {
+            let startPoint = cfg.startPoint;
+            let endPoint = cfg.endPoint;
+
+            let { style } = cfg;
+            let shape = group.addShape('path', {
+                attrs: {
+                    stroke: style.stroke,
+                    // endArrow: style.endArrow,
+                    path: [
+                        ['M', startPoint.x, startPoint.y],
+                        ['L', startPoint.x, (startPoint.y + endPoint.y) / 2],
+                        ['L', endPoint.x, (startPoint.y + endPoint.y) / 2],
+                        ['L', endPoint.x, endPoint.y],
+                    ],
+                },
+            });
+
+            return shape;
+        },
+    });
+
+    const tooltip = new G6.Tooltip({
+        offsetX: 10,
+        offsetY: 0,
+        // v4.2.1 起支持 fixToNode，tooltip 相对于节点固定位置
+        fixToNode: [1, 0],
+        // the types of items that allow the tooltip show up
+        // 允许出现 tooltip 的 item 类型
+        itemTypes: ['node'],
+        // custom the tooltip's content
+        // 自定义 tooltip 内容
+        getContent: (e) => {
+            let outDiv = document.createElement('div');
+            outDiv.style.width = 'fit-content';
+            //outDiv.style.padding = '0px 0px 20px 0px';
+            outDiv.innerHTML = `<p>${e.item.getModel().label}</p>`;
+            return outDiv;
+        },
+    });
+
+    let defaultLayout = {
+        type: 'compactBox',
+        direction: 'TB',
+        getId: function getId(d) {
+            return d.id;
+        },
+        getHeight: function getHeight() {
+            return 16;
+        },
+        getWidth: function getWidth() {
+            return 16;
+        },
+        getVGap: function getVGap() {
+            return 40;
+        },
+        getHGap: function getHGap() {
+            return 70;
+        },
+    };
+
+    let container = document.getElementById('container');
+    let width = container.scrollWidth;
+    let height = container.scrollHeight || 500;
+
+    let graph = new G6.TreeGraph({
+        container: 'container',
+        width,
+        height,
+        linkCenter: true,
+        fitCenter: true,
+        renderer: "svg",
+        plugins: [tooltip],
+        modes: {
+            default: ['drag-canvas', 'zoom-canvas'],
+        },
+        defaultNode: {
+            type: 'dom-node',
+            // size: [120, 40],
+            // style: defaultNodeStyle,
+            // labelCfg: defaultLabelCfg,
+        },
+        defaultEdge: {
+            type: 'flow-line',
+            style: {
+                stroke: '#91d5ff',
+            },
+        },
+        // nodeStateStyles: defaultStateStyles,
+        // edgeStateStyles: defaultStateStyles,
+        layout: defaultLayout,
+    });
+
+
+
+
+    graph.data(data);
+    graph.render();
+    graph.fitView();
+
+
+
+
+
+
+    // const data = {
+    //     // 点集
+    //     nodes: [
+    //         {
+    //             id: 'node1', // String，该节点存在则必须，节点的唯一标识
+    //             size: [160, 60]
+    //         },
+    //         {
+    //             id: 'node2', // String，该节点存在则必须，节点的唯一标识
+    //             size: [160, 60]
+
+    //         },
+    //     ],
+    //     // 边集
+    //     edges: [
+    //         {
+    //             source: 'node1', // String，必须，起始点 id
+    //             target: 'node2', // String，必须，目标点 id
+    //         },
+    //     ],
+    // };
+
+
+    // let graph = new G6.Graph({
+    //     container: 'container',
+    //     width,
+    //     height,
+    //     // translate the graph to align the canvas's center, support by v3.5.1
+    //     fitCenter: true,
+    //     renderer: "svg",
+    //     // modes: {
+    //     //     default: ['drag-node'],
+    //     // },
+    //     modes: {
+    //         default: ['drag-canvas', 'zoom-canvas'],
+    //     },
+    //     defaultNode: {
+    //         type: 'dom-node',
+    //     },
+    // });
+    // graph.data(data);
+    // graph.render(); // 渲染图
+
+
+</script>

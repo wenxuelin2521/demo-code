@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body,
+        #app {
+            width: 100%;
+            height: 100%;
+        }
+
+        .rich-media-node {
+            width: 80px;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: center;
+            color: white;
+            background-color: #ffcaca;
+            border-radius: 4px;
+            position: relative;
+        }
+        .tooltips{
+            position: absolute;
+            display: none;
+            padding: 16px 10px;
+            background-color: yellowgreen;
+            color:#0094ff;
+        }
+    </style>
+    <script src="./lib/vue-tree-chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
+</head>
+
+<body>
+    <div id="app">
+<!-- 
+        <vue-tree style="width: 800px; height: 600px; border: 1px solid gray;" :dataset="sampleData"
+            :config="treeConfig">
+        </vue-tree> -->
+        <!-- <button @click="zoomIn">放大</button>
+        <button @click="zoomOut">缩小</button> -->
+        <vue-tree style="width: 100vh; height: 100vw; border: 1px solid gray; transform-origin: 100% 0; transform: translate(-100vh) rotate(-90deg);" :dataset="richMediaData" :config="treeConfig" ref="tree">
+            <template v-slot:node="{ node, collapsed }">
+                <div class="rich-media-node" :style="{ border: collapsed ? '2px solid grey' : '' }" @mouseover="hoverNode($event)">
+                    <img :src="node.avatar" style="width: 48px; height: 48px; border-raduis: 4px;" />
+                    <span style="padding: 4px 0; font-weight: bold;">能力值{{ node.value }}</span>
+                    <div class="tooltips">
+                        {{node.value}}
+                    </div>
+                </div>
+            </template>
+        </vue-tree>
+    </div>
+</body>
+
+</html>
+
+
+<script>
+    Vue.component('vue-tree', window["vue-tree-chart"].default)
+    console.log(window["vue-tree-chart"].default)
+    new Vue({
+        el: "#app",
+        // data: {
+        // sampleData: {
+        // value: '1',
+        // children: [
+        // { value: '2', children: [{ value: '4' }, { value: '5' }] },
+        // { value: '3' }
+        // ]
+        // },
+        // treeConfig: { nodeWidth: 120, nodeHeight: 80, levelHeight: 200 }
+        // },
+        data() {
+            return {
+                richMediaData: {
+                    name: 'James',
+                    value: 800,
+                    avatar: 'https://gravatar.com/avatar/db51fdaf64d942180b5200ca37d155a4?s=400&d=robohash&r=x',
+                    children: [
+                        {
+                            name: 'Bob',
+                            value: 400,
+                            avatar: 'https://gravatar.com/avatar/16b3b886b837257757c5961513396a06?s=400&d=robohash&r=x',
+                            children: [
+                                {
+                                    name: 'C1',
+                                    value: 100,
+                                    avatar: 'https://gravatar.com/avatar/4ee8775f23f12755db978cccdc1356d9?s=400&d=robohash&r=x'
+                                },
+                                {
+                                    name: 'C2',
+                                    value: 300,
+                                    avatar: 'https://gravatar.com/avatar/d3efa8fa639bdada96a7d0b4372e0a96?s=400&d=robohash&r=x'
+                                },
+                                {
+                                    name: 'C3',
+                                    value: 200,
+                                    avatar: 'https://gravatar.com/avatar/4905bc3e5dc51a61e3b490ccf1891107?s=400&d=robohash&r=x'
+                                }
+                            ]
+                        },
+                        {
+                            name: 'Smith',
+                            value: 200,
+                            avatar: 'https://gravatar.com/avatar/d05d081dbbb513180025300b715d5656?s=400&d=robohash&r=x',
+                            children: [
+                                {
+                                    name: 'S1',
+                                    value: 230,
+                                    avatar: 'https://gravatar.com/avatar/60c1e69e690d943c5dc06568148debc4?s=400&d=robohash&r=x'
+                                }
+                            ]
+                        },
+                        {
+                            name: 'Jackson',
+                            value: 300,
+                            avatar: 'https://gravatar.com/avatar/581f7a711c815d9671c35ebd815ec1e4?s=400&d=robohash&r=x'
+                        }
+                    ]
+                },
+                treeConfig: { nodeWidth: 120, nodeHeight: 80, levelHeight: 200 },
+                linkStyle: 'straight'
+            }
+        },
+        methods: {
+            zoomIn(){
+                this.$refs.tree.zoomIn()
+            },
+            zoomOut(){
+                this.$refs.tree.zoomOut()
+            },
+            hoverNode(e){
+                console.log(e)
+            }
+        },
+    })
+
+</script>

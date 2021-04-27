@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script type="text/javascript" src="./lib/jquery.min.js"></script>
+    <script type="text/javascript" src="./lib/jquery.jOrgChart.js"></script>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.9/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="css/jquery.jOrgChart.css" />
+</head>
+
+<body>
+    <ul id="org" style="display:none">
+        <li>
+            Food
+            <ul>
+                <li>Beer</li>
+                <li>Vegetables
+                    <ul>
+                        <li>Pumpkin</li>
+                        <li><a href="http://tquila.com" target="_blank">Aubergine</a></li>
+                    </ul>
+                </li>
+                <li>Bread</li>
+                <li>Chocolate
+                    <ul>
+                        <li>Topdeck</li>
+                        <li>Reese's Cups</li>
+                    </ul>
+                </li>
+            </ul>
+        </li>
+    </ul>
+</body>
+
+</html>
+
+<script>
+    jQuery(document).ready(function () {
+        $("#org").jOrgChart();
+    });
+</script>
