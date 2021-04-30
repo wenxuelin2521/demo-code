@@ -46,7 +46,7 @@
             background-color: #eee;
             font-size: 30px;
         }
-
+        
         .common-node .label {
             flex: 1;
             padding: 0 5px;
@@ -94,6 +94,7 @@
         }
     </style>
     <script src="https://gw.alipayobjects.com/os/lib/antv/g6/4.2.7/dist/g6.min.js"></script>
+    <script src="./lib/vconsole.min.js"></script>
     <script src="./data.js"></script>
 </head>
 
@@ -108,6 +109,8 @@
 </html>
 
 <script>
+
+    var vConsole = new VConsole();
 
     function selectIcon(level = 0, status = "01") {
 
@@ -126,13 +129,14 @@
     }
 
 
+    // data在data.js中定义
     G6.Util.traverseTree(data, (d) => {
 
         let classStr = selectIcon(d.level, d.status)
 
         d.html = `<div class="common-node">
                     <span class="iconfont ${classStr}"></span>
-                    <span class="label">${d.label}</span>
+                    <span class="label">${d.title}</span>
                 </div>`;
         d.size = [120, 40]
         return true
@@ -149,13 +153,15 @@
         },
         draw(cfg, group) {
             let styles = this.getShapeStyle(cfg);
-            console.log(styles)
+            // console.log(styles)
             let w = styles.width;
             let h = styles.height;
             const shape = group.addShape('dom', {
                 attrs: {
                     width: cfg.size[0],
                     height: cfg.size[1],
+                    x:0,
+                    y:0,
                     // DOM's html
                     html: cfg.html,
                 },
@@ -174,6 +180,46 @@
             return shape;
         }
     }, 'rect')
+
+    G6.registerNode('device-node', {
+        drawShape: function (cfg, group) {
+            const shape = group.addShape('rect', {
+                attrs: {
+                    width: 160,
+                    height: 50,
+                    radius: 5,
+                    fill: "#1d68a0"
+                },
+                name: 'device-container',
+                draggable: false
+            })
+            group.addShape('dom', {
+                attrs: {
+                    width: 40,
+                    height: 40,
+                    x: 5,
+                    y: 5,
+                    html: `<span class="iconfont red iconkehufenbutu"></span>`
+                },
+                name: 'device-icon'
+            })
+
+            group.addShape('text', {
+                attrs: {
+                    textBaseline: 'top',
+                    y: 5,
+                    x: 50,
+                    fontSize:16,
+                    text: "测试发电机",
+                    fill: '#fff',
+                },
+                name: 'title',
+            });
+
+
+            return shape
+        }
+    }, 'single-node')
 
     // 自定义节点
     G6.registerNode('icon-node', {
@@ -226,11 +272,11 @@
             }
 
 
-            if (cfg.label) {
+            if (cfg.title) {
                 group.addShape('text', {
                     attrs: {
                         ...labelCfg.style,
-                        text: cfg.label,
+                        text: cfg.title,
                         x: 50 - w / 2,
                         y: 25 - h / 2,
                     },
@@ -281,7 +327,7 @@
             let outDiv = document.createElement('div');
             outDiv.style.width = 'fit-content';
             //outDiv.style.padding = '0px 0px 20px 0px';
-            outDiv.innerHTML = `<p>${e.item.getModel().label}</p>`;
+            outDiv.innerHTML = `<p>${e.item.getModel().title}</p>`;
             return outDiv;
         },
     });
@@ -299,10 +345,12 @@
             return 16;
         },
         getVGap: function getVGap() {
+            // 每个节点的垂直间隙
             return 40;
         },
         getHGap: function getHGap() {
-            return 70;
+            // 每个节点的水平间隙
+            return 100;
         },
     };
 
@@ -339,11 +387,19 @@
     });
 
 
+    
+
 
 
     graph.data(data);
     graph.render();
     graph.fitView();
+
+
+    setTimeout(() => {
+        console.log('执行了')
+        graph.refresh()
+    }, 3000);
 
 
 

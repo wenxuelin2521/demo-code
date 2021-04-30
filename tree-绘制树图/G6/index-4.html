@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="./iconfont/iconfont.css">
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+        }
+
+        .container {
+            width: 100vw;
+            height: 100vh;
+        }
+        .container{
+            /* width: 100vh;
+            height: 100vw;
+            transform-origin: 100% 0;
+            transform: translate(-100%,0) rotate(-90deg); */
+        }
+
+
+        .iconfont {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            overflow: hidden;
+            line-height: 40px;
+            border-radius: 5px;
+            text-align: center;
+            background-color: #eee;
+            font-size: 30px;
+        }
+
+
+        /* 图标颜色取值*/
+        .red {
+            color: #d81e06;
+        }
+
+        .green {
+            color: #1afa29;
+        }
+
+        .purple {
+            color: #d4237a;
+        }
+
+        .yellow {
+            color: #f4ea2a;
+        }
+
+        .blue {
+            color: #1296db;
+        }
+    </style>
+    <script src="https://gw.alipayobjects.com/os/lib/antv/g6/4.2.7/dist/g6.min.js"></script>
+    <script src="./lib/vconsole.min.js"></script>
+    <script src="./data.js"></script>
+</head>
+
+<body>
+    <div id="container" class="container"></div>
+</body>
+
+</html>
+
+<script>
+
+    var vConsole = new VConsole();
+
+    function selectIcon(level = 0, status = "01") {
+
+        const iconList = ["iconkehufenbutu", "iconshebei", "iconwangdianjifang", "iconshebeiguanli", "iconzhuji"]
+
+        const colorList = {
+            "01": "red",
+            "02": "green",
+            "03": "purple",
+            "04": "yellow",
+            "05": "blue"
+        }
+
+        return `${iconList[level]}  ${colorList[status]}`
+
+    }
+
+
+    // data在data.js中定义
+    G6.Util.traverseTree(data, (d) => {
+
+        let classStr = selectIcon(d.level, d.status)
+
+        d.html = `<span class="iconfont ${classStr}"></span>`
+        return true
+
+    });
+
+
+    G6.registerNode('device-node', {
+        drawShape: function (cfg, group) {
+            const shape = group.addShape('rect', {
+                attrs: {
+                    width: 160,
+                    height: 50,
+                    radius: 5,
+                    fill: "#1d68a0"
+                },
+                name: 'device-container',
+                draggable: false
+            })
+            group.addShape('dom', {
+                attrs: {
+                    width: 40,
+                    height: 40,
+                    x: 5,
+                    y: 5,
+                    html: cfg.html
+                },
+                name: 'device-icon'
+            })
+
+            group.addShape('text', {
+                attrs: {
+                    textBaseline: 'top',
+                    y: 5,
+                    x: 50,
+                    fontSize:16,
+                    text: cfg.title,
+                    fill: '#fff',
+                },
+                name: 'title',
+            });
+
+
+            return shape
+        }
+    }, 'single-node')
+
+
+    // 自定义边
+    G6.registerEdge('flow-line', {
+        draw(cfg, group) {
+            let startPoint = cfg.startPoint;
+            let endPoint = cfg.endPoint;
+
+            let { style } = cfg;
+            let shape = group.addShape('path', {
+                attrs: {
+                    stroke: style.stroke,
+                    // endArrow: style.endArrow,
+                    path: [
+                        ['M', startPoint.x, startPoint.y],
+                        ['L', startPoint.x, (startPoint.y + endPoint.y) / 2],
+                        ['L', endPoint.x, (startPoint.y + endPoint.y) / 2],
+                        ['L', endPoint.x, endPoint.y],
+                    ],
+                },
+            });
+
+            return shape;
+        },
+    });
+
+    const tooltip = new G6.Tooltip({
+        offsetX: 10,
+        offsetY: 0,
+        // v4.2.1 起支持 fixToNode，tooltip 相对于节点固定位置
+        fixToNode: [1, 0],
+        // the types of items that allow the tooltip show up
+        // 允许出现 tooltip 的 item 类型
+        itemTypes: ['node'],
+        // custom the tooltip's content
+        // 自定义 tooltip 内容
+        getContent: (e) => {
+            let outDiv = document.createElement('div');
+            outDiv.style.width = 'fit-content';
+            //outDiv.style.padding = '0px 0px 20px 0px';
+            outDiv.innerHTML = `<p>${e.item.getModel().title}</p>`;
+            return outDiv;
+        },
+    });
+
+    let defaultLayout = {
+        type: 'compactBox',
+        direction: 'TB',
+        getId: function getId(d) {
+            return d.id;
+        },
+        getHeight: function getHeight() {
+            return 16;
+        },
+        getWidth: function getWidth() {
+            return 16;
+        },
+        getVGap: function getVGap() {
+            // 每个节点的垂直间隙
+            return 40;
+        },
+        getHGap: function getHGap() {
+            // 每个节点的水平间隙
+            return 100;
+        },
+    };
+
+    let container = document.getElementById('container');
+    let width = container.scrollWidth;
+    let height = container.scrollHeight || 500;
+
+    let graph = new G6.TreeGraph({
+        container: 'container',
+        width,
+        height,
+        linkCenter: true,
+        fitCenter: true,
+        renderer: "svg",
+        plugins: [tooltip],
+        modes: {
+            default: ['zoom-canvas',{
+                type : 'drag-canvas'
+            }],
+        },
+        defaultNode: {
+            type: 'device-node',
+            // size: [120, 40],
+            // style: defaultNodeStyle,
+            // labelCfg: defaultLabelCfg,
+        },
+        defaultEdge: {
+            type: 'flow-line',
+            style: {
+                stroke: '#91d5ff',
+            },
+        },
+        // nodeStateStyles: defaultStateStyles,
+        // edgeStateStyles: defaultStateStyles,
+        layout: defaultLayout,
+    });
+
+
+    console.log('graph' , graph)
+    graph.on('canvas:dragstart', e => {
+        console.log('begin')
+    })
+    graph.on('canvas:drag', e => {
+        console.log('ing')
+    })
+    graph.on('canvas:drag', e => {
+        console.log('end')
+    })
+
+
+
+    graph.data(data);
+    graph.render();
+    graph.fitView();
+
+
+
+
+</script>

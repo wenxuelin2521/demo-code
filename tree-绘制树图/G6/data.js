@@ -26,49 +26,49 @@ function createUUID() {
 
 var data = {
     id: createUUID(),
-    label: "电表箱",
+    title: "电表箱",
     level: 0, // 决定层级
     status: "01", // 决定颜色
     children: [
 
         {
             id: createUUID(),
-            label: "电表01",
+            title: "电表01",
             level: 1,
             status: "01",
             children: [
 
                 {
                     id: createUUID(),
-                    label: "低压出线柜01",
+                    title: "低压出线柜01",
                     level: 2,
                     status: "01",
                     children: [
 
                         {
                             id: createUUID(),
-                            label: "变压器01",
+                            title: "变压器01",
                             level: 3,
                             status: "03",
                             children: []
                         },
                         {
                             id: createUUID(),
-                            label: "变压器02",
+                            title: "变压器02",
                             level: 3,
                             status: "05",
                             children: [
 
                                 {
                                     id: createUUID(),
-                                    label: "分支箱01",
+                                    title: "分支箱01",
                                     level: 4,
                                     status: "05",
                                     children: []
                                 },
                                 {
                                     id: createUUID(),
-                                    label: "分支箱02",
+                                    title: "分支箱02",
                                     level: 4,
                                     status: "05",
                                     children: []
@@ -79,7 +79,7 @@ var data = {
                 },
                 {
                     id: createUUID(),
-                    label: "低压出线柜02",
+                    title: "低压出线柜02",
                     level: 2,
                     status: "02",
                     children: []
@@ -89,49 +89,49 @@ var data = {
         },
         {
             id: createUUID(),
-            label: "电表02",
+            title: "电表02",
             level: 1,
             status: "02",
             children: []
         },
         {
             id: createUUID(),
-            label: "电表03",
+            title: "电表03",
             level: 1,
             status: "03",
             children: [
 
                 {
                     id: createUUID(),
-                    label: "低压出线柜01",
+                    title: "低压出线柜01",
                     level: 2,
                     status: "01",
                     children: []
                 },
                 {
                     id: createUUID(),
-                    label: "低压出线柜02",
+                    title: "低压出线柜02",
                     level: 2,
                     status: "02",
                     children: [
 
                         {
                             id: createUUID(),
-                            label: "变压器01",
+                            title: "变压器01",
                             level: 3,
                             status: "01",
                             children: []
                         },
                         {
                             id: createUUID(),
-                            label: "变压器02",
+                            title: "变压器02",
                             level: 3,
                             status: "03",
                             children: []
                         },
                         {
                             id: createUUID(),
-                            label: "变压器03",
+                            title: "变压器03",
                             level: 3,
                             status: "04",
                             children: []
@@ -140,7 +140,7 @@ var data = {
                 },
                 {
                     id: createUUID(),
-                    label: "低压出线柜02",
+                    title: "低压出线柜02",
                     level: 2,
                     status: "02",
                     children: []
