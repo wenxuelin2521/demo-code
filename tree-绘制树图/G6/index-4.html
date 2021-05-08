@@ -18,7 +18,8 @@
             width: 100vw;
             height: 100vh;
         }
-        .container{
+
+        .container {
             /* width: 100vh;
             height: 100vw;
             transform-origin: 100% 0;
@@ -60,9 +61,11 @@
             color: #1296db;
         }
     </style>
-    <script src="https://gw.alipayobjects.com/os/lib/antv/g6/4.2.7/dist/g6.min.js"></script>
-    <script src="./lib/vconsole.min.js"></script>
+    <script src="./lib/g6.min.js"></script>
+    <!-- <script src="./lib/vconsole.min.js"></script> -->
     <script src="./data.js"></script>
+    <!-- <script src="./lib/gl-matrix.js"></script>
+    <script src="./lib/matrix.js"></script> -->
 </head>
 
 <body>
@@ -73,7 +76,7 @@
 
 <script>
 
-    var vConsole = new VConsole();
+    // var vConsole = new VConsole();
 
     function selectIcon(level = 0, status = "01") {
 
@@ -131,7 +134,7 @@
                     textBaseline: 'top',
                     y: 5,
                     x: 50,
-                    fontSize:16,
+                    fontSize: 16,
                     text: cfg.title,
                     fill: '#fff',
                 },
@@ -221,10 +224,9 @@
         fitCenter: true,
         renderer: "svg",
         plugins: [tooltip],
+        minZoom:0.2,
         modes: {
-            default: ['zoom-canvas',{
-                type : 'drag-canvas'
-            }],
+            default: ['zoom-canvas', 'drag-canvas'],
         },
         defaultNode: {
             type: 'device-node',
@@ -244,22 +246,81 @@
     });
 
 
-    console.log('graph' , graph)
-    graph.on('canvas:dragstart', e => {
-        console.log('begin')
-    })
-    graph.on('canvas:drag', e => {
-        console.log('ing')
-    })
-    graph.on('canvas:drag', e => {
-        console.log('end')
-    })
+    // 拖拽开始事件
+    // graph.on('canvas:dragstart', e => {
+    // })
+    // // 拖拽进行中
+    // graph.on('canvas:drag', e => {
+    // })
+    // // 拖拽结束
+    // graph.on('canvas:drag', e => {
+    // })
+    // graph.on('wheel' , e => {
+    //     e.preventDefault();
+    //     const canvas = graph.get('canvas');
+    //     const point = canvas.getPointByClient(e.clientX, e.clientY);
+    //     const sensitivity = 2;
+    //     const DELTA = 0.05;
+    //     const graphZoom = graph.getZoom();
+    //     let ratio = graphZoom;
+    //     if (e.wheelDelta < 0) {
+    //         ratio = 1 - DELTA * sensitivity;
+    //     } else {
+    //         ratio = 1 / (1 - DELTA * sensitivity);
+    //     }
+    //     zoom = graphZoom * ratio;
+    //     const minZoom = graph.get('minZoom') || graph.get('minZoom');
+    //     const maxZoom = graph.get('maxZoom') || graph.get('maxZoom');
+    //     // console.log(zoom , point.x , point.y)
+
+    //     // if (zoom > maxZoom || zoom < minZoom) {
+    //     //     return;
+    //     // }
+    //     console.log(zoom , point.x , point.y)
+    //     graph.zoomTo(zoom, { x: point.x, y: point.y });
+    // }) 
+    // graph.on('touchstart' , e => {
+    // }) 
+    // graph.on('touchmove' , e => {
+    // })
+    // graph.on('touchend' , e => {
+    // })
 
 
 
     graph.data(data);
     graph.render();
     graph.fitView();
+
+
+
+    // 中心点逆时针旋转90度
+    // graph.get('group').rotateAtPoint(width/2,height/2,-Math.PI /2)
+
+
+    // const canvas = graph.get('canvas')
+    // console.log(canvas)
+    // console.log("graph.get('group')" , graph.zoomTo)
+
+
+
+    // const center = [width/2,height/2]; // 图的中心
+    // graph.get('group').scale(1.5)
+    // graph.get('group').moveTo(-center[0], -center[1])
+
+
+    // const center = [width/2,height/2]; // 图的中心
+    // let matrix = graph.getGroup().getMatrix() || [1, 0, 0, 0, 1, 0, 0, 0, 1];
+    // // // 以图中心为旋转中心
+    // matrix = MatrixUtils.transform(matrix, [
+    //     ['t', -center[0], -center[1]],  // 先平移到中心
+    //     ['r', -Math.PI / 2], // 旋转
+    //     ['t', center[0], center[1]], // 再平移回去
+    // ]);
+    // console.log(matrix)
+    // graph.getGroup().setMatrix(matrix)
+
+
 
 
 
