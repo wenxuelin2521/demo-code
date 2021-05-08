@@ -14,20 +14,50 @@
             box-sizing: border-box;
         }
 
-        .container {
-            width: 100vw;
-            height: 100vh;
+        html,body{
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .basic-info{
+            position: absolute;
+            top:30px;
+            right:30px;
+            background:#fff;
+            color:#333;
+            font-size: 14px;
+            border-radius:4px;
+            border-color: rgba(0,0,0,.09);
+            box-shadow:0 2px 8px rgb(0 0 0 / 9%);
+            padding:5px 10px;
+            display: none;
+        }
+
+        .basic-info h5{
+            font-size: 16px;
+            font-weight: bold;
+            line-height: 1.5;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .basic-info h5 .iconfont {
+            cursor: pointer;
+            float: right;
+            margin-top: -3px;
+        }
+        
+        .basic-info p {
+            line-height: 2;
         }
 
         .container {
-            /* width: 100vh;
-            height: 100vw;
-            transform-origin: 100% 0;
-            transform: translate(-100%,0) rotate(-90deg); */
+            width: 100%;
+            height: 100%;
         }
 
 
-        .iconfont {
+        .device-icon.iconfont {
             display: inline-block;
             width: 40px;
             height: 40px;
@@ -60,24 +90,30 @@
         .blue {
             color: #1296db;
         }
+
+        .root-tips{
+            line-height:1.2;
+            font-size: 12px;
+        }
     </style>
     <script src="./lib/g6.min.js"></script>
-    <!-- <script src="./lib/vconsole.min.js"></script> -->
     <script src="./data.js"></script>
-    <!-- <script src="./lib/gl-matrix.js"></script>
-    <script src="./lib/matrix.js"></script> -->
 </head>
 
 <body>
     <div id="container" class="container"></div>
+    <div class="basic-info" id="basic-info">
+        <h5>基本信息<span id="close-btn" class="icon iconfont iconbaseline-close-px"></span></h5>
+        <p>名称：电表-洪涛</p>
+        <p>通信地址：001234876500</p>
+        <p>相位：C相</p>
+        <p>KAT：916.26</p>
+    </div>
 </body>
 
 </html>
 
 <script>
-
-    // var vConsole = new VConsole();
-
     function selectIcon(level = 0, status = "01") {
 
         const iconList = ["iconkehufenbutu", "iconshebei", "iconwangdianjifang", "iconshebeiguanli", "iconzhuji"]
@@ -100,12 +136,13 @@
 
         let classStr = selectIcon(d.level, d.status)
 
-        d.html = `<span class="iconfont ${classStr}"></span>`
+        d.html = `<span class="device-icon iconfont ${classStr}"></span>`
         return true
 
     });
 
 
+    // 自定义节点
     G6.registerNode('device-node', {
         drawShape: function (cfg, group) {
             const shape = group.addShape('rect', {
@@ -140,6 +177,25 @@
                 },
                 name: 'title',
             });
+            if(cfg.level === 0){
+                group.addShape('dom' , {
+                    attrs : {
+                        width:100,
+                        height:100,
+                        x:170,
+                        y:-20,
+                        html:`<div class="root-tips">
+                            <p class="blue">P:--kW</p>
+                            <p class="blue">Q:--kVar</p>
+                            <p class="blue">S:--kVa</p>
+                            <p class="yellow">Ia:--A</p>
+                            <p class="green">Ib:--A</p>
+                            <p class="red">Ic:--A</p>
+                            </div>`
+                    }
+                })
+            }
+            
 
 
             return shape
@@ -150,13 +206,34 @@
     // 自定义边
     G6.registerEdge('flow-line', {
         draw(cfg, group) {
+
             let startPoint = cfg.startPoint;
             let endPoint = cfg.endPoint;
 
-            let { style } = cfg;
+
+            const colorList = {
+                "01": "red",
+                "02": "green",
+                "03": "blue",
+                "04": "pink",
+                "05": "orange"
+            }
+            let lineStroke = "#000000";
+            try {
+                lineStroke = colorList[cfg.targetNode._cfg.model.status]
+            } catch (err) {
+                console.error(err)
+            }
+
+
+            let {
+                style
+            } = cfg;
             let shape = group.addShape('path', {
                 attrs: {
-                    stroke: style.stroke,
+                    // stroke: style.stroke,
+                    stroke: lineStroke,
+                    lineWidth: 3,
                     // endArrow: style.endArrow,
                     path: [
                         ['M', startPoint.x, startPoint.y],
@@ -169,6 +246,64 @@
 
             return shape;
         },
+        afterDraw(cfg, group) {
+            // get the first shape in the group, it is the edge's path here=
+            const shape = group.get('children')[0];
+            let index = 0;
+            // Define the animation
+            shape.animate(
+                () => {
+                    index++;
+                    if (index > 9) {
+                        index = 0;
+                    }
+                    const lineDash = [4, 2, 1, 2]
+                    const res = {
+                        lineDash,
+                        lineDashOffset: -index,
+                    };
+                    // returns the modified configurations here, lineDash and lineDashOffset here
+                    return res;
+                }, {
+                    repeat: true, // whether executes the animation repeatly
+                    duration: 3000, // the duration for executing once
+                },
+            );
+        },
+        // afterDraw(cfg, group) {
+        //     // get the first shape in the group, it is the edge's path here=
+        //     const shape = group.get('children')[0];
+        //     // the start position of the edge's path
+        //     const startPoint = shape.getPoint(0);
+
+        //     // add red circle shape
+        //     const circle = group.addShape('circle', {
+        //         attrs: {
+        //             x: startPoint.x,
+        //             y: startPoint.y,
+        //             fill: '#33689c',
+        //             r: 4,
+        //         },
+        //         name: 'circle-shape',
+        //     });
+
+        //     // animation for the red circle
+        //     circle.animate(
+        //         (ratio) => {
+        //             // the operations in each frame. Ratio ranges from 0 to 1 indicating the prograss of the animation. Returns the modified configurations
+        //             // get the position on the edge according to the ratio
+        //             const tmpPoint = shape.getPoint(ratio);
+        //             // returns the modified configurations here, x and y here
+        //             return {
+        //                 x: tmpPoint.x,
+        //                 y: tmpPoint.y,
+        //             };
+        //         }, {
+        //         repeat: true, // Whether executes the animation repeatly
+        //         duration: 3000, // the duration for executing once
+        //     },
+        //     );
+        // },
     });
 
     const tooltip = new G6.Tooltip({
@@ -224,9 +359,9 @@
         fitCenter: true,
         renderer: "svg",
         plugins: [tooltip],
-        minZoom:0.2,
+        minZoom: 0.2,
         modes: {
-            default: ['zoom-canvas', 'drag-canvas'],
+            default: ['zoom-canvas', 'drag-canvas', 'collapse-expand'],
         },
         defaultNode: {
             type: 'device-node',
@@ -245,84 +380,17 @@
         layout: defaultLayout,
     });
 
-
-    // 拖拽开始事件
-    // graph.on('canvas:dragstart', e => {
-    // })
-    // // 拖拽进行中
-    // graph.on('canvas:drag', e => {
-    // })
-    // // 拖拽结束
-    // graph.on('canvas:drag', e => {
-    // })
-    // graph.on('wheel' , e => {
-    //     e.preventDefault();
-    //     const canvas = graph.get('canvas');
-    //     const point = canvas.getPointByClient(e.clientX, e.clientY);
-    //     const sensitivity = 2;
-    //     const DELTA = 0.05;
-    //     const graphZoom = graph.getZoom();
-    //     let ratio = graphZoom;
-    //     if (e.wheelDelta < 0) {
-    //         ratio = 1 - DELTA * sensitivity;
-    //     } else {
-    //         ratio = 1 / (1 - DELTA * sensitivity);
-    //     }
-    //     zoom = graphZoom * ratio;
-    //     const minZoom = graph.get('minZoom') || graph.get('minZoom');
-    //     const maxZoom = graph.get('maxZoom') || graph.get('maxZoom');
-    //     // console.log(zoom , point.x , point.y)
-
-    //     // if (zoom > maxZoom || zoom < minZoom) {
-    //     //     return;
-    //     // }
-    //     console.log(zoom , point.x , point.y)
-    //     graph.zoomTo(zoom, { x: point.x, y: point.y });
-    // }) 
-    // graph.on('touchstart' , e => {
-    // }) 
-    // graph.on('touchmove' , e => {
-    // })
-    // graph.on('touchend' , e => {
-    // })
-
-
-
     graph.data(data);
     graph.render();
     graph.fitView();
 
 
-
-    // 中心点逆时针旋转90度
-    // graph.get('group').rotateAtPoint(width/2,height/2,-Math.PI /2)
-
-
-    // const canvas = graph.get('canvas')
-    // console.log(canvas)
-    // console.log("graph.get('group')" , graph.zoomTo)
-
-
-
-    // const center = [width/2,height/2]; // 图的中心
-    // graph.get('group').scale(1.5)
-    // graph.get('group').moveTo(-center[0], -center[1])
-
-
-    // const center = [width/2,height/2]; // 图的中心
-    // let matrix = graph.getGroup().getMatrix() || [1, 0, 0, 0, 1, 0, 0, 0, 1];
-    // // // 以图中心为旋转中心
-    // matrix = MatrixUtils.transform(matrix, [
-    //     ['t', -center[0], -center[1]],  // 先平移到中心
-    //     ['r', -Math.PI / 2], // 旋转
-    //     ['t', center[0], center[1]], // 再平移回去
-    // ]);
-    // console.log(matrix)
-    // graph.getGroup().setMatrix(matrix)
-
-
-
-
-
-
+    document.querySelector('#container').addEventListener('click' , (e) => {
+        if(e.target.classList.contains('device-icon')){
+            document.querySelector('#basic-info').style.display = "block"
+        }
+    })
+    document.querySelector('#close-btn').addEventListener('click' , (e) => {
+        document.querySelector('#basic-info').style.display = "none"
+    })
 </script>
