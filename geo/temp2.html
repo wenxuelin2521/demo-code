@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+    <div>
+        <!-- <span id="load_geolocation">点击获取位置</span> -->
+    </div>
+
+</body>
+
+</html>
+
+<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=ZdHBB6RmpwqM29Wg3BPL1nOs3MKEKqQl&type=webgl"></script>
+<script type="text/javascript" src="https://lib.baomitu.com/jquery/3.5.1/jquery.js"></script>
+
+<script>
+    // var map = new BMapGL.Map('container');
+    // map.centerAndZoom(new BMapGL.Point(116.331398, 39.897445), 12);
+    //创建地址解析器实例
+    var myGeo = new BMapGL.Geocoder();
+    myGeo.getLocation(new BMapGL.Point(116.364, 39.993), function (result) {
+        if (result) {
+            // alert(result.address)
+            console.log(result);
+        }
+    });
+    // $("#load_geolocation").click(function (ev) {
+    //     $(ev.currentTarget).text("正在获取位置......");
+    //     //创建百度地图控件
+    //     var geolocation = new BMap.Geolocation();
+    //     geolocation.getCurrentPosition(function (r) {
+    //         var adds = r.point;
+    //         var latitude = adds.lat,
+    //             longitude = adds.lng;
+    //         console.log('=======r', r)
+
+    //         if (this.getStatus() == BMAP_STATUS_SUCCESS) {
+    //             $.ajax({
+    //                 url: 'http://api.map.baidu.com/geocoder/v2/?ak=ZdHBB6RmpwqM29Wg3BPL1nOs3MKEKqQl&location=' +
+    //                     latitude + ',' + longitude + '&output=json&pois=1',
+    //                 dataType: 'jsonp',
+    //                 contentType: 'application/json; charset=utf-8',
+    //                 callback: 'BMap._rd._cbk43398',
+    //                 success: function (res) {
+    //                     console.log(res);
+    //                     var result = res.result,
+    //                         addressComponent = result.addressComponent,
+    //                         adcode = addressComponent.adcode
+    //                     $(ev.currentTarget).text('城市号码为' + adcode);
+    //                 }
+    //             });
+
+    //         } else {
+    //             $(ev.currentTarget).text('定位失败');
+    //         }
+    //     }, {
+    //         enableHighAccuracy: true
+    //     }) //指示浏览器获取高精度的位置，默认false
+    // });
+</script>
+
+<!-- 
+<script>
+    var geolocation = new BMap.Geolocation(); //创建geolocation实例，返回用户当前的位置
+        // 开启SDK辅助定位
+        geolocation.enableSDKLocation();
+        geolocation.getCurrentPosition(function(r){ //返回用户当前位置。当定位成功时，回调函数的参数为GeolocationResult对象，否则为null
+            if(this.getStatus() == BMAP_STATUS_SUCCESS){
+                sessionStorage.setItem("SDKLng",r.point.lng);
+                sessionStorage.setItem("SDKLat",r.point.lat);
+                $.ajax({
+                    url:'http://api.map.baidu.com/geocoder/v2/?ak=Ya2nSaqjT3vNrIgba1v4nfWzSxGdtgZD&location=' + r.point.lat + ',' + r.point.lng + '&output=json',
+                    dataType: 'jsonp',
+                    callback: 'BMap._rd._cbk43398',
+                    success: function(res) {
+                        console.log(res);
+                        var result = res.result,
+                            addressComponent = result.addressComponent,
+                            adcode = addressComponent.adcode
+                    } ,
+                    error:function(){
+
+                    }
+                });
+
+            }
+            else {
+                alert('failed'+this.getStatus());
+            }
+        },{enableHighAccuracy: true});
+</script> -->

@@ -49,3 +49,25 @@ Function.prototype._call = function () {
     delete context.fn;
     return res;
 }
+
+
+
+
+function fun(somthing){
+    console.log(this.name , somthing)
+}
+
+function bindFun(fn , obj){
+    return function(){
+        return fn.apply(obj,arguments)
+    }
+}
+var obj = {
+    name:"LiLei"
+}
+var bar = bindFun(fun , obj)
+var b = bar("HanMeiMei")
+console.log(b)
+
+// LiLei HanMeiMei
+// undefined

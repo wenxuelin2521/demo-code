@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+</head>
+
+<body>
+
+</body>
+
+</html>
+
+<script>
+
+    axios.get('https://restapi.amap.com/v3/ip?key=1617b4fe13f901880f617c0e1ebb304b')
+        .then(function (response) {
+            console.log(response);
+        })
+        .catch(function (error) {
+            console.log(error);
+        });
+
+        axios.get('https://restapi.amap.com/v3/geocode/regeo?key=1617b4fe13f901880f617c0e1ebb304b&location=113.6770499,23.3809537')
+        .then(function (response) {
+            console.log(response);
+        })
+        .catch(function (error) {
+            console.log(error);
+        });
+</script>

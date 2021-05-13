@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>QQ JS省市区三级联动</title>
+    <!-- 使用QQ的省市区数据 -->
+    <!--
+<script type="text/javascript" src="http://ip.qq.com/js/geo.js"></script>
+-->
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+    <script type="text/javascript" src="https://lib.baomitu.com/jquery/3.5.1/jquery.js"></script>
+</head>
+
+<body>
+    <script type="text/javascript">
+        
+        // $.getScript('http://int.dpool.sina.com.cn/iplookup/iplookup.php?format=js', function(_result) {//新浪接口
+        //     if (remote_ip_info.ret == '1') {
+        //         alert('国家：' + remote_ip_info.country + '<BR>省：' + remote_ip_info.province + '<BR>市：' + remote_ip_info.city + '<BR>区：' + remote_ip_info.district + '<BR>ISP：' + remote_ip_info.isp + '<BR>类型：' + remote_ip_info.type + '<BR>其他：' + remote_ip_info.desc);
+        //     } else {
+        //         alert('没有找到匹配的IP地址信息！');
+        //     }
+        // });
+        // $.ajax({
+        //     //请求方式
+        //     type: "GET",
+        //     //请求的媒体类型
+        //     contentType: "application/json;charset=UTF-8",
+        //     //请求地址
+        //     url: "http://api.map.baidu.com/location/ip?ak=ZdHBB6RmpwqM29Wg3BPL1nOs3MKEKqQl",
+        //     //数据，json字符串
+        //     // data : JSON.stringify(list),
+        //     //请求成功
+        //     success: function (result) {
+        //         console.log(result);
+        //     },
+        //     //请求失败，包含具体的错误信息
+        //     error: function (e) {
+        //         console.log(e.status);
+        //         console.log(e.responseText);
+        //     }
+        // });
+        $.ajax({
+            url: 'http://api.map.baidu.com/location/ip?ak=ZdHBB6RmpwqM29Wg3BPL1nOs3MKEKqQl',
+            type: 'GET',
+            async: false, //设置同步。ajax默认异步
+            dataType: 'jsonp',
+            jsonp: 'callback', //传递给请求处理程序或页面的，用以获得jsonp回调函数名的参数名(默认为:callback)
+            jsonpCallback: "callback", //自定义的jsonp回调函数名称，默认为jQuery自动生成的随机函数名
+            timeout: 5000,
+            contentType: 'application/json; charset=utf-8',
+            success: function (result) {
+                console.log(result);
+            }
+        })
+        // axios.get('http://api.map.baidu.com/location/ip?ak=ZdHBB6RmpwqM29Wg3BPL1nOs3MKEKqQl')
+        //     .then(function (response) {
+        //         console.log(response);
+        //     })
+        //     .catch(function (error) {
+        //         console.log(error);
+        //     });
+    // </script>
+</body>
+
+</html>

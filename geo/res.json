@@ -1,0 +1,35 @@
+{
+    "status": "1",
+    "regeocode": {
+        "addressComponent": {
+            "city": "广州市",
+            "province": "广东省",
+            "adcode": "440118",
+            "district": "增城区",
+            "towncode": "440118103000",
+            "streetNumber": {
+                "number": [],
+                "direction": [],
+                "distance": [],
+                "street": []
+            },
+            "country": "中国",
+            "township": "中新镇",
+            "businessAreas": [
+                []
+            ],
+            "building": {
+                "name": [],
+                "type": []
+            },
+            "neighborhood": {
+                "name": [],
+                "type": []
+            },
+            "citycode": "020"
+        },
+        "formatted_address": "广东省广州市增城区中新镇下青山"
+    },
+    "info": "OK",
+    "infocode": "10000"
+}
