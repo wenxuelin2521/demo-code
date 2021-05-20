@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="./iconfont/iconfont.css" />
+    <style>
+      * {
+        padding: 0;
+        margin: 0;
+      }
+
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+      }
+
+      .container {
+        width: 100%;
+        height: 100%;
+      }
+
+      .device-icon.iconfont {
+        display: inline-block;
+        width: 40px;
+        height: 40px;
+        overflow: hidden;
+        line-height: 40px;
+        border-radius: 5px;
+        text-align: center;
+        background-color: #eee;
+        font-size: 30px;
+        /* transform-origin: center center;
+            transform: rotate(-90deg); */
+      }
+
+      /* 图标颜色取值*/
+      .red {
+        color: #d81e06;
+      }
+
+      .green {
+        color: #1afa29;
+      }
+
+      .purple {
+        color: #d4237a;
+      }
+
+      .yellow {
+        color: #f4ea2a;
+      }
+
+      .blue {
+        color: #1296db;
+      }
+
+      .root-tips {
+        line-height: 1.2;
+        font-size: 12px;
+      }
+      .tooltips {
+        position: fixed;
+        border: 1px solid #e2e2e2;
+        border-radius: 4px;
+        font-size: 12px;
+        color: #545454;
+        background-color: rgba(255, 255, 255, 0.9);
+        padding: 10px 8px;
+        box-shadow: rgb(174, 174, 174) 0px 0px 10px;
+        transform: rotate(-90deg);
+        animation: all 1s ease;
+        animation-fill-mode: forwards;
+        opacity: 0;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+
+        to {
+          opacity: 1;
+        }
+      }
+      .animate__fadeIn {
+        -webkit-animation-name: fadeIn;
+        animation-name: fadeIn;
+      }
+
+      @keyframes fadeOut {
+        from {
+          opacity: 1;
+        }
+
+        to {
+          opacity: 0;
+        }
+      }
+      .animate__fadeOut {
+        -webkit-animation-name: fadeOut;
+        animation-name: fadeOut;
+      }
+    </style>
+    <script src="https://gw.alipayobjects.com/os/lib/antv/g6/4.2.7/dist/g6.min.js"></script>
+    <!-- <script src="./lib/g6.min.js"></script> -->
+    <script src="./data.js"></script>
+  </head>
+
+  <body>
+    <div class="tooltips" id="tooltips">123</div>
+    <div id="container" class="container"></div>
+  </body>
+</html>
+
+<script>
+  function selectIcon(level = 0, status = "01") {
+    const iconList = [
+      "iconkehufenbutu",
+      "iconshebei",
+      "iconwangdianjifang",
+      "iconshebeiguanli",
+      "iconzhuji",
+    ];
+
+    const colorList = {
+      "01": "red",
+      "02": "green",
+      "03": "purple",
+      "04": "yellow",
+      "05": "blue",
+    };
+
+    return `${iconList[level]}  ${colorList[status]}`;
+  }
+
+  // data在data.js中定义
+  G6.Util.traverseTree(data, (d) => {
+    let classStr = selectIcon(d.level, d.status);
+
+    d.html = `<span class="device-icon iconfont ${classStr}"></span>`;
+    return true;
+  });
+
+  // 自定义节点
+  G6.registerNode(
+    "tree-node",
+    {
+      drawShape: function drawShape(cfg, group) {
+        const rect = group.addShape("rect", {
+          attrs: {
+            fill: "#1d68a0",
+            stroke: "#666",
+            x: 0,
+            y: 0,
+            width: 50,
+            height: 160,
+          },
+          name: "rect-shape",
+        });
+
+        const dom = group.addShape("dom", {
+          attrs: {
+            width: 40,
+            height: 40,
+            x: 5,
+            y: 115,
+            html: cfg.html,
+          },
+          name: "device-icon",
+        });
+        dom.rotateAtPoint(25, 135, -Math.PI / 2);
+
+        const text = group.addShape("text", {
+          attrs: {
+            textBaseline: "top",
+
+            x: 5,
+            y: 105,
+            fontSize: 16,
+            text: cfg.title,
+            fill: "#fff",
+          },
+          name: "title",
+        });
+        text.rotateAtPoint(5, 105, -Math.PI / 2);
+
+        if (cfg.level === 0) {
+          const rootTips = group.addShape("dom", {
+            attrs: {
+              width: 100,
+              height: 100,
+              x: 0,
+              y: -20,
+              html: `<div class="root-tips">
+                            <p class="blue">P:--kW</p>
+                            <p class="blue">Q:--kVar</p>
+                            <p class="blue">S:--kVa</p>
+                            <p class="yellow">Ia:--A</p>
+                            <p class="green">Ib:--A</p>
+                            <p class="red">Ic:--A</p>
+                            </div>`,
+            },
+          });
+          rootTips.rotateAtPoint(0, -20, -Math.PI / 2);
+        }
+
+        return rect;
+      },
+    },
+    "single-node"
+  );
+
+  // 自定义边
+  G6.registerEdge("flow-line", {
+    draw(cfg, group) {
+      let startPoint = cfg.startPoint;
+      let endPoint = cfg.endPoint;
+
+      const colorList = {
+        "01": "red",
+        "02": "green",
+        "03": "blue",
+        "04": "pink",
+        "05": "orange",
+      };
+      let lineStroke = "#000000";
+      try {
+        lineStroke = colorList[cfg.targetNode._cfg.model.status];
+      } catch (err) {
+        console.error(err);
+      }
+
+      let { style } = cfg;
+      let shape = group.addShape("path", {
+        attrs: {
+          // stroke: style.stroke,
+          stroke: lineStroke,
+          lineWidth: 3,
+          // endArrow: style.endArrow,
+          path: [
+            ["M", startPoint.x, startPoint.y],
+            ["L", (startPoint.x + endPoint.x) / 2, startPoint.y],
+            ["L", (startPoint.x + endPoint.x) / 2, endPoint.y],
+            ["L", endPoint.x, endPoint.y],
+          ],
+        },
+      });
+
+      return shape;
+    },
+    afterDraw(cfg, group) {
+      // get the first shape in the group, it is the edge's path here=
+      const shape = group.get("children")[0];
+      let index = 0;
+      // Define the animation
+      shape.animate(
+        () => {
+          index++;
+          if (index > 9) {
+            index = 0;
+          }
+          const lineDash = [4, 2, 1, 2];
+          const res = {
+            lineDash,
+            lineDashOffset: -index,
+          };
+          // returns the modified configurations here, lineDash and lineDashOffset here
+          return res;
+        },
+        {
+          repeat: true, // whether executes the animation repeatly
+          duration: 3000, // the duration for executing once
+        }
+      );
+    },
+  });
+
+  const tooltip = new G6.Tooltip({
+    offsetX: 10,
+    offsetY: 0,
+    // v4.2.1 起支持 fixToNode，tooltip 相对于节点固定位置
+    fixToNode: [1, 0],
+    // the types of items that allow the tooltip show up
+    // 允许出现 tooltip 的 item 类型
+    itemTypes: ["node"],
+    // custom the tooltip's content
+    // 自定义 tooltip 内容
+    getContent: (e) => {
+      let outDiv = document.createElement("div");
+      outDiv.style.width = "fit-content";
+      //outDiv.style.padding = '0px 0px 20px 0px';
+      outDiv.innerHTML = `<p>${e.item.getModel().title}</p>`;
+      return outDiv;
+    },
+  });
+
+  const container = document.getElementById("container");
+  const width = container.scrollWidth;
+  const height = container.scrollHeight || 500;
+  const graph = new G6.TreeGraph({
+    container: "container",
+    width,
+    height,
+    linkCenter: true,
+    fitCenter: true,
+    renderer: "svg",
+    // plugins: [tooltip],
+    modes: {
+      default: [
+        "drag-canvas",
+        "zoom-canvas",
+        // {
+        //   type: "tooltip", // 提示框
+        //   formatText(model) {
+        //     // 提示框文本内容
+        //     const text = model.title;
+        //     return text;
+        //   },
+        //   offset: 10,
+        // },
+      ],
+    },
+    defaultNode: {
+      type: "tree-node",
+      anchorPoints: [
+        [0, 0.5],
+        [1, 0.5],
+      ],
+    },
+    defaultEdge: {
+      type: "flow-line",
+      style: {
+        stroke: "#A3B1BF",
+      },
+    },
+    layout: {
+      type: "compactBox",
+      direction: "LR",
+      getId: function getId(d) {
+        return d.id;
+      },
+      getHeight: function getHeight() {
+        return 16;
+      },
+      getWidth: function getWidth() {
+        return 16;
+      },
+      getVGap: function getVGap() {
+        return 80;
+      },
+      getHGap: function getHGap() {
+        return 80;
+      },
+    },
+  });
+
+  graph.data(data);
+  graph.render();
+  graph.fitView();
+  graph.on("node:click", (ev) => {
+    const tooltips = document.querySelector("#tooltips");
+    tooltips.style.left = `${ev.clientX}px`;
+    tooltips.style.top = `${ev.clientY}px`;
+    tooltips.innerHTML = ev.item._cfg.model.title;
+    tooltips.classList.add("animate__fadeIn");
+    setTimeout(() => {
+      tooltips.classList.remove("animate__fadeIn");
+    }, 2000);
+  });
+  graph.on("node:touchstart", (ev) => {
+    const tooltips = document.querySelector("#tooltips");
+    tooltips.style.left = `${ev.clientX}px`;
+    tooltips.style.top = `${ev.clientY}px`;
+    tooltips.innerHTML = ev.item._cfg.model.title;
+    tooltips.classList.add("animate__fadeIn");
+    setTimeout(() => {
+      tooltips.classList.remove("animate__fadeIn");
+    }, 2000);
+  });
+</script>

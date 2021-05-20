@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="./iconfont/iconfont.css">
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+        }
+
+        html,body{
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .basic-info{
+            position: absolute;
+            top:30px;
+            right:30px;
+            background:#fff;
+            color:#333;
+            font-size: 14px;
+            border-radius:4px;
+            border-color: rgba(0,0,0,.09);
+            box-shadow:0 2px 8px rgb(0 0 0 / 9%);
+            padding:5px 10px;
+            display: none;
+        }
+
+        .basic-info h5{
+            font-size: 16px;
+            font-weight: bold;
+            line-height: 1.5;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .basic-info h5 .iconfont {
+            cursor: pointer;
+            float: right;
+            margin-top: -3px;
+        }
+        
+        .basic-info p {
+            line-height: 2;
+        }
+
+        .container {
+            width: 100%;
+            height: 100%;
+        }
+
+
+        .device-icon.iconfont {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            overflow: hidden;
+            line-height: 40px;
+            border-radius: 5px;
+            text-align: center;
+            background-color: #eee;
+            font-size: 30px;
+        }
+
+
+        /* 图标颜色取值*/
+        .red {
+            color: #d81e06;
+        }
+
+        .green {
+            color: #1afa29;
+        }
+
+        .purple {
+            color: #d4237a;
+        }
+
+        .yellow {
+            color: #f4ea2a;
+        }
+
+        .blue {
+            color: #1296db;
+        }
+
+        .root-tips{
+            line-height:1.2;
+            font-size: 12px;
+        }
+    </style>
+    <script src="./lib/g6.min.js"></script>
+    <script src="./data.js"></script>
+</head>
+
+<body>
+    <div id="container" class="container"></div>
+    <div class="basic-info" id="basic-info">
+        <h5>基本信息<span id="close-btn" class="icon iconfont iconbaseline-close-px"></span></h5>
+        <p>名称：电表-洪涛</p>
+        <p>通信地址：001234876500</p>
+        <p>相位：C相</p>
+        <p>KAT：916.26</p>
+    </div>
+</body>
+
+</html>
+
+<script>
+    function selectIcon(level = 0, status = "01") {
+
+        const iconList = ["iconkehufenbutu", "iconshebei", "iconwangdianjifang", "iconshebeiguanli", "iconzhuji"]
+
+        const colorList = {
+            "01": "red",
+            "02": "green",
+            "03": "purple",
+            "04": "yellow",
+            "05": "blue"
+        }
+
+        return `${iconList[level]}  ${colorList[status]}`
+
+    }
+
+
+    // data在data.js中定义
+    G6.Util.traverseTree(data, (d) => {
+
+        let classStr = selectIcon(d.level, d.status)
+
+        d.html = `<span class="device-icon iconfont ${classStr}"></span>`
+        return true
+
+    });
+
+
+    // 自定义节点
+    G6.registerNode('device-node', {
+        drawShape: function (cfg, group) {
+            const shape = group.addShape('rect', {
+                attrs: {
+                    width: 160,
+                    height: 50,
+                    radius: 5,
+                    fill: "#1d68a0"
+                },
+                name: 'device-container',
+                draggable: false
+            })
+            group.addShape('dom', {
+                attrs: {
+                    width: 40,
+                    height: 40,
+                    x: 5,
+                    y: 5,
+                    html: cfg.html
+                },
+                name: 'device-icon'
+            })
+
+            group.addShape('text', {
+                attrs: {
+                    textBaseline: 'top',
+                    y: 5,
+                    x: 50,
+                    fontSize: 16,
+                    text: cfg.title,
+                    fill: '#fff',
+                },
+                name: 'title',
+            });
+            if(cfg.level === 0){
+                group.addShape('dom' , {
+                    attrs : {
+                        width:100,
+                        height:100,
+                        x:170,
+                        y:-20,
+                        html:`<div class="root-tips">
+                            <p class="blue">P:--kW</p>
+                            <p class="blue">Q:--kVar</p>
+                            <p class="blue">S:--kVa</p>
+                            <p class="yellow">Ia:--A</p>
+                            <p class="green">Ib:--A</p>
+                            <p class="red">Ic:--A</p>
+                            </div>`
+                    }
+                })
+            }
+            
+
+
+            return shape
+        }
+    }, 'single-node')
+
+
+    // 自定义边
+    G6.registerEdge('flow-line', {
+        draw(cfg, group) {
+
+            let startPoint = cfg.startPoint;
+            let endPoint = cfg.endPoint;
+
+
+            const colorList = {
+                "01": "red",
+                "02": "green",
+                "03": "blue",
+                "04": "pink",
+                "05": "orange"
+            }
+            let lineStroke = "#000000";
+            try {
+                lineStroke = colorList[cfg.targetNode._cfg.model.status]
+            } catch (err) {
+                console.error(err)
+            }
+
+
+            let {
+                style
+            } = cfg;
+            let shape = group.addShape('path', {
+                attrs: {
+                    // stroke: style.stroke,
+                    stroke: lineStroke,
+                    lineWidth: 3,
+                    // endArrow: style.endArrow,
+                    path: [
+                        ['M', startPoint.x, startPoint.y],
+                        ['L', startPoint.x, (startPoint.y + endPoint.y) / 2],
+                        ['L', endPoint.x, (startPoint.y + endPoint.y) / 2],
+                        ['L', endPoint.x, endPoint.y],
+                    ],
+                },
+            });
+
+            return shape;
+        },
+        afterDraw(cfg, group) {
+            // get the first shape in the group, it is the edge's path here=
+            const shape = group.get('children')[0];
+            let index = 0;
+            // Define the animation
+            shape.animate(
+                () => {
+                    index++;
+                    if (index > 9) {
+                        index = 0;
+                    }
+                    const lineDash = [4, 2, 1, 2]
+                    const res = {
+                        lineDash,
+                        lineDashOffset: -index,
+                    };
+                    // returns the modified configurations here, lineDash and lineDashOffset here
+                    return res;
+                }, {
+                    repeat: true, // whether executes the animation repeatly
+                    duration: 3000, // the duration for executing once
+                },
+            );
+        },
+        // afterDraw(cfg, group) {
+        //     // get the first shape in the group, it is the edge's path here=
+        //     const shape = group.get('children')[0];
+        //     // the start position of the edge's path
+        //     const startPoint = shape.getPoint(0);
+
+        //     // add red circle shape
+        //     const circle = group.addShape('circle', {
+        //         attrs: {
+        //             x: startPoint.x,
+        //             y: startPoint.y,
+        //             fill: '#33689c',
+        //             r: 4,
+        //         },
+        //         name: 'circle-shape',
+        //     });
+
+        //     // animation for the red circle
+        //     circle.animate(
+        //         (ratio) => {
+        //             // the operations in each frame. Ratio ranges from 0 to 1 indicating the prograss of the animation. Returns the modified configurations
+        //             // get the position on the edge according to the ratio
+        //             const tmpPoint = shape.getPoint(ratio);
+        //             // returns the modified configurations here, x and y here
+        //             return {
+        //                 x: tmpPoint.x,
+        //                 y: tmpPoint.y,
+        //             };
+        //         }, {
+        //         repeat: true, // Whether executes the animation repeatly
+        //         duration: 3000, // the duration for executing once
+        //     },
+        //     );
+        // },
+    });
+
+    const tooltip = new G6.Tooltip({
+        offsetX: 10,
+        offsetY: 0,
+        // v4.2.1 起支持 fixToNode，tooltip 相对于节点固定位置
+        fixToNode: [1, 0],
+        // the types of items that allow the tooltip show up
+        // 允许出现 tooltip 的 item 类型
+        itemTypes: ['node'],
+        // custom the tooltip's content
+        // 自定义 tooltip 内容
+        getContent: (e) => {
+            let outDiv = document.createElement('div');
+            outDiv.style.width = 'fit-content';
+            //outDiv.style.padding = '0px 0px 20px 0px';
+            outDiv.innerHTML = `<p>${e.item.getModel().title}</p>`;
+            return outDiv;
+        },
+    });
+
+    let defaultLayout = {
+        type: 'compactBox',
+        direction: 'TB',
+        getId: function getId(d) {
+            return d.id;
+        },
+        getHeight: function getHeight() {
+            return 16;
+        },
+        getWidth: function getWidth() {
+            return 16;
+        },
+        getVGap: function getVGap() {
+            // 每个节点的垂直间隙
+            return 40;
+        },
+        getHGap: function getHGap() {
+            // 每个节点的水平间隙
+            return 100;
+        },
+    };
+
+    let container = document.getElementById('container');
+    let width = container.scrollWidth;
+    let height = container.scrollHeight || 500;
+
+    let graph = new G6.TreeGraph({
+        container: 'container',
+        width,
+        height,
+        linkCenter: true,
+        fitCenter: true,
+        renderer: "svg",
+        plugins: [tooltip],
+        minZoom: 0.2,
+        modes: {
+            default: ['zoom-canvas', 'drag-canvas', 'collapse-expand'],
+        },
+        defaultNode: {
+            type: 'device-node',
+            // size: [120, 40],
+            // style: defaultNodeStyle,
+            // labelCfg: defaultLabelCfg,
+        },
+        defaultEdge: {
+            type: 'flow-line',
+            style: {
+                stroke: '#91d5ff',
+            },
+        },
+        // nodeStateStyles: defaultStateStyles,
+        // edgeStateStyles: defaultStateStyles,
+        layout: defaultLayout,
+    });
+
+    graph.data(data);
+    graph.render();
+    graph.fitView();
+
+
+    document.querySelector('#container').addEventListener('click' , (e) => {
+        if(e.target.classList.contains('device-icon')){
+            document.querySelector('#basic-info').style.display = "block"
+        }
+    })
+    document.querySelector('#close-btn').addEventListener('click' , (e) => {
+        document.querySelector('#basic-info').style.display = "none"
+    })
+</script>
