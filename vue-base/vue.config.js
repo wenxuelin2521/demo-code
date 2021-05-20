@@ -80,6 +80,6 @@ module.exports = {
         name: "img/[name].[hash:7].[ext]",
         publicPath: assetsPublicPath
       });
-  }
-  // lintOnSave: false // 关闭eslint检查
+  },
+  lintOnSave: false // 关闭eslint检查
 };
