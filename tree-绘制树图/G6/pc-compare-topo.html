@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>台区档案对比详情</title>
+
+    <link rel="stylesheet" href="//at.alicdn.com/t/font_2539132_7868op8214c.css">
+
+    <script src="https://gw.alipayobjects.com/os/lib/antv/g6/4.2.7/dist/g6.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body,
+        .app,
+        .container {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            position: relative;
+        }
+
+        .container .left-chart,
+        .container .right-chart {
+            flex: 1;
+            height: 100%;
+        }
+
+        .left-chart {
+            position: relative;
+        }
+
+        .left-chart::after {
+            content: "";
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            height: 90%;
+            border-right: 1px solid #ccc;
+
+        }
+
+        .right-chart {
+            /* position: relative; */
+        }
+
+        .legend{
+            position: absolute;
+            right: 10px;
+            top:10px;
+            width: 200px;
+            height: 150px;
+        }
+
+        /* 图标的样式 */
+        .device-icon.iconfont {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            overflow: hidden;
+            line-height: 40px;
+            border-radius: 5px;
+            text-align: center;
+            background-color: #fff;
+            font-size: 30px;
+        }
+
+        /* 定义图标颜色的类名 */
+        .red {
+            color: #d81e06;
+        }
+
+        .green {
+            color: #1afa29;
+        }
+
+        .purple {
+            color: #d4237a;
+        }
+
+        .yellow {
+            color: #f4ea2a;
+        }
+
+        .blue {
+            color: #1296db;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app" class="app">
+        <div class="container">
+            <div class="left-chart" id="left-chart"></div>
+            <div class="right-chart" id="right-chart"></div>
+            <img class="legend" src="./legend.png" alt="">
+        </div>
+    </div>
+
+</body>
+
+</html>
+
+<script src="./data-compare.js"></script>
+<script>
+    // 定义一个颜色的数据，根据不同的状态值，取不同的颜色
+    const colorList = ['blue' , 'red' , 'green' , 'purple' , 'yellow']
+    // 返回图标的类名：决定使用哪种图标，哪种颜色
+    function selectIcon(index = 0, status = 0) {
+
+        // 使用图标的类名
+        const iconList = ["icon-bianyaqi", "icon-diyachuxiangui", "icon-dianbiao", "icon-_fenzhixiang",
+            "icon-dianbiaoxiang-"
+        ]
+
+        return `${iconList[index]}  ${colorList[status]} `
+
+    }
+
+    // 自定义节点
+    G6.registerNode('device-node', {
+        drawShape: function (cfg, group) {
+            const shape = group.addShape('dom', {
+                attrs: {
+                    width: 40,
+                    height: 40,
+                    html: cfg.html
+                },
+                name: 'device-icon'
+            })
+            group.addShape('rect', {
+                attrs: {
+                    width: 40,
+                    height: 40,
+                    radius: 5,
+                    fill: "transparent"
+                },
+                name: 'device-container',
+                draggable: false
+            })
+
+            if (cfg.index === 0) {
+                group.addShape('text', {
+                    attrs: {
+                        text: '台区拓扑（XX）',
+                        x: 0,
+                        y: -10,
+                        fontSize: 14,
+                        textAlign: 'left',
+                        textBaseline: 'middle',
+                        fill: '#000',
+                    },
+                    name: 'device-name',
+                });
+            }
+
+            return shape
+        }
+    }, 'single-node')
+
+
+    // 自定义边
+    G6.registerEdge('flow-line', {
+        draw(cfg, group) {
+
+            let startPoint = cfg.startPoint;
+            let endPoint = cfg.endPoint;
+
+            let lineStroke = "";
+            try {
+                lineStroke = colorList[cfg.targetNode._cfg.model.status]
+            } catch (err) {
+                lineStroke = "#000000"; // 线条颜色默认黑色
+                console.error(err)
+            }
+
+
+            let { style } = cfg;
+            let shape = group.addShape('path', {
+                attrs: {
+                    stroke: lineStroke,
+                    lineWidth: 3,
+                    path: [
+                        ['M', startPoint.x, startPoint.y],
+                        ['L', startPoint.x, (startPoint.y + endPoint.y) / 2],
+                        ['L', endPoint.x, (startPoint.y + endPoint.y) / 2],
+                        ['L', endPoint.x, endPoint.y],
+                    ],
+                },
+            });
+
+            return shape;
+        },
+    });
+
+    // 布局
+    let defaultLayout = {
+        type: 'compactBox',
+        direction: 'TB',
+        getId: function getId(d) {
+            return d.id;
+        },
+        getHeight: function getHeight() {
+            return 16;
+        },
+        getWidth: function getWidth() {
+            return 16;
+        },
+        getVGap: function getVGap() {
+            // 每个节点的垂直间隙
+            return 40;
+        },
+        getHGap: function getHGap() {
+            // 每个节点的水平间隙
+            return 20;
+        },
+    };
+
+    const tooltipsOptions = {
+        offsetX: 10,
+        offsetY: 0,
+        // v4.2.1 起支持 fixToNode，tooltip 相对于节点固定位置
+        fixToNode: [1, 0],
+        // the types of items that allow the tooltip show up
+        // 允许出现 tooltip 的 item 类型
+        itemTypes: ['node'],
+        // custom the tooltip's content
+        // 自定义 tooltip 内容
+        getContent: (e) => {
+            let outDiv = document.createElement('div');
+            outDiv.style.width = 'fit-content';
+            //outDiv.style.padding = '0px 0px 20px 0px';
+            outDiv.innerHTML = `<p>${e.item.getModel().desc}</p>`;
+            return outDiv;
+        }
+    }
+    const tooltipLeft = new G6.Tooltip(tooltipsOptions);
+    const tooltipRight = new G6.Tooltip(tooltipsOptions);
+
+    window.onload = function () {
+        let vm = new Vue({
+            el: "#app",
+            data: {
+            },
+            mounted() {
+                var leftData = this.treeDataHanler(fakeData)
+                var rightData = this.treeDataHanler(fakeDataRight)
+                this.generatorTreeGraph('left-chart' , leftData , tooltipLeft)
+                this.generatorTreeGraph('right-chart' , rightData , tooltipRight)
+                
+            },
+            methods: {
+                // 数据处理
+                treeDataHanler(data) {
+                    G6.Util.traverseTree(data, (d) => {
+
+                        let classStr = selectIcon(d.level, d.status)
+
+                        d.html = `<span class="device-icon iconfont ${classStr}"></span>`
+                        return true
+
+                    });
+                    return data
+                },
+                // 绘制树
+                generatorTreeGraph(targetDom, renderData , tooltipsOpt) {
+                    let container = document.getElementById(targetDom);
+                    let width = container.scrollWidth;
+                    let height = container.scrollHeight || 500;
+                    let graph = new G6.TreeGraph({
+                        container: targetDom,
+                        width,
+                        height,
+                        linkCenter: true,
+                        fitCenter: true,
+                        renderer: "svg",
+                        plugins: [tooltipsOpt],
+                        minZoom: 0.2,
+                        modes: {
+                            default: ['zoom-canvas', 'drag-canvas', 'collapse-expand'],
+                        },
+                        defaultNode: {
+                            type: 'device-node',
+                        },
+                        defaultEdge: {
+                            type: 'flow-line',
+                            style: {
+                                stroke: '#91d5ff',
+                            },
+                        },
+                        layout: defaultLayout,
+                    });
+
+                    graph.data(renderData);
+                    graph.render();
+                    graph.fitView();
+                    return graph
+                }
+            },
+        })
+    }
+</script>

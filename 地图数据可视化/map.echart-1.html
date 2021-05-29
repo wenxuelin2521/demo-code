@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body,
+        .chart-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        .back-button {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: #333;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 10px 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="chart-container" class="chart-container">
+
+    </div>
+    <div id="back-button" class="back-button">返回</div>
+</body>
+
+</html>
+<script src="./libs/jquery.min.js"></script>
+<script src="./libs/echarts.min.js"></script>
+
+<script>
+    window.onload = function () {
+
+        // 下钻历史
+        const history = []
+
+
+        // 地区json数据
+        const geoList = [{
+                mapName: "yunan",
+                fileName: "云南省"
+            },
+            {
+                mapName: "baoshanshi",
+                fileName: "保山市"
+            },
+            {
+                mapName: "chuxiong",
+                fileName: "楚雄"
+            },
+            {
+                mapName: "dalibaizu",
+                fileName: "大理白族"
+            },
+            {
+                mapName: "dehongdaizu",
+                fileName: "德宏傣族"
+            },
+            {
+                mapName: "diqing",
+                fileName: "迪庆"
+            },
+            {
+                mapName: "honghehanizu",
+                fileName: "红河哈尼族"
+            },
+            {
+                mapName: "kunmingshi",
+                fileName: "昆明市"
+            },
+            {
+                mapName: "lijiangshi",
+                fileName: "丽江市"
+            },
+            {
+                mapName: "lincangshi",
+                fileName: "临沧市"
+            },
+            {
+                mapName: "nujiang",
+                fileName: "怒江"
+            },
+            {
+                mapName: "puershi",
+                fileName: "普洱市"
+            },
+            {
+                mapName: "qujingshi",
+                fileName: "曲靖市"
+            },
+            {
+                mapName: "wenshanzhuangzu",
+                fileName: "文山壮族"
+            },
+            {
+                mapName: "xishuangbanna",
+                fileName: "西双版纳"
+            },
+            {
+                mapName: "yuxishi",
+                fileName: "玉溪市"
+            },
+            {
+                mapName: "zhaotongshi",
+                fileName: "昭通市"
+            },
+            {
+                mapName: "dongcunqu",
+                fileName: "东川区"
+            }
+
+        ]
+
+        // 散点图数据
+        const mapPointData = [{
+                value: [102.803396, 26.3029],
+                itemStyle: {
+                    color: "#ffcaca"
+                }
+            },
+            {
+                value: [102.903396, 26.1029],
+                itemStyle: {
+                    color: "#0094ff"
+                }
+            },
+        ]
+
+        // 线图数据
+        const mapLineData = [{
+            coords: [
+                [102.803396, 26.3029],
+                [102.903396, 26.1029]
+            ],
+            lineStyle: {
+                color: '#0f0'
+            }
+        }]
+
+        // 生成echarts实例
+        var myChart = echarts.init(document.getElementById('chart-container'));
+
+        // 点击地图区域事件
+        myChart.on('click', function (e) {
+            if(history.length ===3){
+                return
+            }
+            var chooseName = geoList.filter(item => {
+                return e.name.indexOf(item.fileName) != -1
+            })
+            if(!chooseName.length){
+                console.error('缺少json数据')
+                return
+            }
+            var api = `/地图数据可视化/json/${chooseName[0].fileName}.geo.json`
+
+            console.log(chooseName[0].mapName, api)
+
+            mapInit(chooseName[0].mapName, api)
+            backCtrl(true)
+        })
+
+        // 显示/隐藏返回按钮
+        function backCtrl(isShow = false) {
+            if (isShow)
+                document.querySelector('#back-button').style.display = "block"
+            else
+                document.querySelector('#back-button').style.display = "none"
+        }
+
+        document.querySelector('#back-button').addEventListener('click', function () {
+            history.pop()
+            const index = history.length - 1
+            mapInit(history[index].mapName, history[index].api)
+            history.pop()
+            if(history.length ===1){
+                backCtrl(false)
+            }
+        })
+
+        // 初始化地图
+        function mapInit(mapName = 'yunnan', api = '/地图数据可视化/json/云南省.geo.json') {
+            history.push({
+                mapName,
+                api
+            })
+
+            myChart.clear()
+            $.getJSON(api, function (geoJson) {
+                console.log(geoJson)
+                echarts.registerMap(mapName, geoJson);
+                var option = {}
+                option = {
+                    backgroundColor: '#020933',
+                    geo: {
+                        show: false,
+                        map: mapName,
+                        aspectScale: 1, //长宽比
+                        zoom: 1.1,
+                        roam: false, // 开启鼠标缩放，平移漫游
+                        itemStyle: {
+                            normal: {
+                                areaColor: '#013C62',
+                                shadowColor: '#182f68',
+                                shadowOffsetX: 0,
+                                shadowOffsetY: 25,
+                                borderWidth: 1,
+                                borderColor: "#0094ff"
+                            },
+                            emphasis: {
+                                areaColor: '#2AB8FF',
+                                borderWidth: 0,
+                            }
+
+                        }
+                    },
+                    series: [{
+                            type: 'map',
+                            roam: true,
+                            label: {
+                                normal: {
+                                    show: true,
+                                    textStyle: {
+                                        color: '#fff'
+                                    }
+                                },
+                                emphasis: {
+                                    show: true,
+                                    textStyle: {
+                                        color: '#fff'
+                                    }
+                                }
+                            },
+
+                            itemStyle: {
+                                normal: {
+                                    areaColor: '#013C62',
+                                    shadowColor: '#182f68',
+                                    shadowOffsetX: 0,
+                                    shadowOffsetY: 25,
+                                    borderWidth: 1,
+                                    borderColor: "#0094ff"
+                                },
+                                emphasis: {
+                                    areaColor: '#2AB8FF',
+                                    borderWidth: 0,
+                                }
+                            },
+                            aspectScale: 1, //长宽比
+                            zoom: 1.1,
+                            roam: true,
+                            map: mapName //使用
+                        },
+                        {
+                            type: 'effectScatter',
+                            coordinateSystem: 'geo',
+                            showEffectOn: 'render',
+                            zlevel: 1,
+                            rippleEffect: {
+                                period: 15,
+                                scale: 4,
+                                brushType: 'fill'
+                            },
+                            hoverAnimation: true,
+                            label: {
+                                normal: {
+                                    formatter: '{b}',
+                                    position: 'right',
+                                    offset: [15, 0],
+                                    color: '#1DE9B6',
+                                    show: true
+                                },
+                            },
+                            itemStyle: {
+                                normal: {
+                                    color: '#1DE9B6'
+                                        /* function (value){ //随机颜色
+                                         return "#"+("00000"+((Math.random()*16777215+0.5)>>0).toString(16)).slice(-6);
+                                         }*/
+                                        ,
+                                    shadowBlur: 10,
+                                    shadowColor: '#333'
+                                }
+                            },
+                            symbolSize: 12,
+                            data: mapPointData
+                        },
+                        {
+                            type: 'lines',
+                            zlevel: 2,
+                            // effect: {
+                            //     show: true,
+                            //     period: 4, //箭头指向速度，值越小速度越快
+                            //     trailLength: 0.4, //特效尾迹长度[0,1]值越大，尾迹越长重
+                            //     symbol: 'arrow', //箭头图标
+                            //     symbolSize: 7, //图标大小
+                            // },
+                            lineStyle: {
+                                normal: {
+                                    color: '#ffcaca',
+                                    width: 4, //线条宽度
+                                    // opacity: 0.1, //尾迹线条透明度
+                                    curveness: .3 //尾迹线条曲直度
+                                }
+                            },
+                            data: mapLineData
+                        }
+
+                    ]
+                };
+                myChart.setOption(option);
+
+            })
+        }
+        mapInit()
+    }
+</script>
